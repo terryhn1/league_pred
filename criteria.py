@@ -34,14 +34,19 @@ Common Criteria:
 
     High cooperation in a team gives more advanced gameplay. Factors that determine teamwork can judge a game's outcome highly.
 
-
-
-    Thus, we can separate into the certain dependent probabilities
-        P(Teamplay | Jungle Monsters Killed), P(Lane Dominance | Wards Destroyed, Wards Placed)
-        P(Lane Dominance | Total CS)
-        P(Lane Dominance | Experience, Gold), P(Teamplay | Turrets Destroyed)
-        P(Lane Dominance | )
-        P(Win Condition | Teamplay, Lane Dominance)
+    Thus, we can look at a few probabilites as independent factors
+        - P(Jungle Monsters Killed)
+        - P(Turrets Destroyed)
+        - P(Total CS Difference)
+        - P(Ward Score Difference)
+        - P(Elite Monsters)
+    
+    Then we can use these factors to determine dependent factors
+        - P(Gold Difference | Jungle Monsters Killed, Elite Monsters)
+        - P(Experience Difference | Jungle Monsters Killed, Total CS Difference)
+        - P(Teamplay | Jungle Monsters Killed, Turrets Detroyed, Ward Score Difference, Elite Monsters)
+        - P(Lane Dominance | Gold Difference, Experience Difference, KDA)
+        - P(Win Condition | Lance Dominance, Teamplay)
     
     Lane Dominance and Teamplay are good indicators of a win condition for a team. Without lane dominance, then the Snowball Effect is not as prominent
 
