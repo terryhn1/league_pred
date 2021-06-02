@@ -41,17 +41,22 @@ laneDominance = gm.Var(9,4)
 winCondition = gm.Var(10, 2)
 
 #Initialize the factors
-f1 = gm.Factor([jgMonstersKilled, goldDifference, expDifference, teamplayScore])
-f2 = gm.Factor([turretsDestroyed,teamplayScore])
-f3 = gm.Factor([csDifference, goldDifference, expDifference])
-f4 = gm.Factor([wardScoreDifference, teamplayScore])
-f5 = gm.Factor([eliteMonsters,goldDifference, teamplayScore])
-f6 = gm.Factor([goldDifference, laneDominance])
-f7 = gm.Factor([expDifference, laneDominance])
-f8 = gm.Factor([teamplayScore, avgKDA, winCondition])
-f9 = gm.Factor([laneDominance, avgKDA, winCondition])
 
-factors = [f1,f2,f3, f4, f5, f6, f7, f8, f9]
+#Indepedent factors first
+f1 = gm.Factor([jgMonstersKilled])
+f2 = gm.Factor([turretsDestroyed])
+f3 = gm.Factor([csDifference])
+f4 = gm.Factor([wardScoreDifference])
+f5 = gm.Factor([eliteMonsters])
+
+
+#Dependent Factors after
+f6 = gm.Factor([goldDifference, jgMonstersKilled, jgMonstersKilled])
+f7 = gm.Factor([expDifference, jgMonstersKilled, csDifference])
+f8 = gm.Factor([teamplayScore, jgMonstersKilled, turretsDestroyed, wardScoreDifference, eliteMonsters])
+f9 = gm.Factor([laneDominance, goldDifference, expDifference, avgKDA])
+f10 = gm.Factor([winCondition, laneDominance, teamplayScore])
+
 
 model = gm.GraphModel(factors)
 
