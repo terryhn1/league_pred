@@ -32,12 +32,9 @@ Team Data Split:
     Index 18: Gold/Min
 """
 
-#Functions for N x 19 Arrays
+#Create the simple Functions for N x 19 Arrays to extract individual data
 def getWardData(team_data):
     return team_data[:,0:2]
-
-def getFirstBlood(team_data):
-    return team_data[:,1]
 
 def getTeamKDA(team_data):
     return team_data[:,3:6]
@@ -53,6 +50,11 @@ def getGoldEXPDifference(team_data):
 
 def getFarmPerMin(team_data):
     return team_data[:,17:19]
+
+
+#Create the functions that are needed to get the estimated probabilties(Make this similar to Assignment 4 for consistency).
+
+
 
 if __name__ == "__main__":
 
