@@ -51,6 +51,15 @@ def getGoldEXPDifference(team_data):
 def getFarmPerMin(team_data):
     return team_data[:,17:19]
 
+#simple functions
+def _simple3(diff, data):
+    for i in range(len(diff)):
+        if diff[i] == 0: data[i] = 0
+        elif diff[i] > 0: data[i] = 1
+        elif diff[i] < 0: data[i] = 2
+    return data
+
+
 #Scoring
 def setWardStates(blue_data, red_data):
     blueWardData = getWardData(blue_data)
@@ -104,18 +113,30 @@ def setTurretsDestroyed(blue_data, red_data):
 
     #We are interested in seeing which team displays more teamplay
     #Therefore the states that given are only 0, 1, and 2
-    for i in range(len(diff)):
-        if diff[i] == 0: data[i] = 0
-        elif diff[i] > 0: data[i] = 1
-        elif diff[i] < 0: data[i] = 2
-
-    return data
+    return _simple3(diff, data)
 
 def setCSDifference(blue_data, red_data):
-    pass
+    blueMinionScore = getTotalStats(blue_data)
+    redMinionScore = getTotalStats(red_data)
+    diff = blueMinionScore - redMinionScore
+    data = np.zeros(blueMinionScore.shape)
+
+    #Minions killed is a sign of lane dominance need to expend 0,1,2 as the states 
+    # 0: indicates theres probably no difference in win condition
+    # 1: indicates blue team is more preferred
+    # 2: indicates red team is more preferred
+
+    return _simple3(diff, data)
 
 def setEliteMonsters(blue_data, red_data):
-    pass
+    #There is a max of two elites that can be taken. They are good indicators of gold
+    #and teamplay throughout the match. WE take on the same structure as previous methods
+    blueElites = getObjectives(blue_data)[0]
+    redElites = getObjectives(red_data)[0]
+    diff = blueElites - redElites
+    data = np.zeros(blueElites.shape)
+
+    return _simple3(diff,data)
 
 
 #Creating new data that uses the average data: KDA, Jungle Monsters Killed, CS Difference, Ward Score Diff, Gold Diff, Exp Diff, 
@@ -125,10 +146,7 @@ def dataSetTrueExtraction(win_condition, blue_data, red_data):
     wardDifference = setWardStates(blue_data, red_data)
     jungleDifference = setJGMonstersKilled(blue_data, red_data)
     turretsDifference = setTurretsDestroyed(blue_data, red_data)
-    
-
-    
-    
+    CSDifference = setCSDifference(blue_data, red_data)
 
 
 if __name__ == "__main__":
