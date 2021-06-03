@@ -1,7 +1,5 @@
-import numpy as np
 
-"""
-The goal of this module is to estimate the relationship between certain pieces of data on winrate.
+"""The goal of this module is to estimate the relationship between certain pieces of data on winrate.
 Common Structure: How does this stat relate to the win condition? What is the threshold for winning?
 
 Common Criteria:
@@ -50,14 +48,4 @@ Common Criteria:
     
     Lane Dominance and Teamplay are good indicators of a win condition for a team. Without lane dominance, then the Snowball Effect is not as prominent
 
-
 """
-
-
-def teamplayScoring():
-    pass
-
-def laneDominanceScoring():
-    pass
-
-

@@ -1,5 +1,4 @@
 import numpy as np
-
 """
 Game Data Organization
 -----------------------
@@ -74,8 +73,8 @@ def setWardStates(blue_data, red_data):
     return data
 
 def setJGMonstersKilled(blue_data, red_data):
-    blueJG = getTotalStats(blue_data)[-1]
-    redJG = getTotalStats(red_data)[-1]
+    blueJG = getTotalStats(blue_data)[:,-1]
+    redJG = getTotalStats(red_data)[:,-1]
 
     #Put it into thresholds
     avgJG = np.sum(blueJG) + np.sum(redJG) / (len(blueJG) * 2)
@@ -105,8 +104,8 @@ def setJGMonstersKilled(blue_data, red_data):
     return data
 
 def setTurretsDestroyed(blue_data, red_data):
-    blueTurretScore = getObjectives(blue_data)[-1]
-    redTurretScore = getObjectives(red_data)[-1]
+    blueTurretScore = getObjectives(blue_data)[:,-1]
+    redTurretScore = getObjectives(red_data)[:,-1]
     diff = blueTurretScore - redTurretScore
 
     data = np.zeros(blueTurretScore.shape)
@@ -131,8 +130,8 @@ def setCSDifference(blue_data, red_data):
 def setEliteMonsters(blue_data, red_data):
     #There is a max of two elites that can be taken. They are good indicators of gold
     #and teamplay throughout the match. WE take on the same structure as previous methods
-    blueElites = getObjectives(blue_data)[0]
-    redElites = getObjectives(red_data)[0]
+    blueElites = getObjectives(blue_data)[:,0]
+    redElites = getObjectives(red_data)[:,0]
     diff = blueElites - redElites
     data = np.zeros(blueElites.shape)
 
@@ -140,14 +139,14 @@ def setEliteMonsters(blue_data, red_data):
 
 def setGoldDifference(blue_data):
     #3 Possible states
-    blueGoldDiff = getGoldEXPDifference(blue_data)[0]
+    blueGoldDiff = getGoldEXPDifference(blue_data)[:,0]
 
     data = np.zeros(blueGoldDiff.shape)
 
     return _simple3(blueGoldDiff, data)
 
 def setExperienceDifference(blue_data):
-    blueEXPDiff = getGoldEXPDifference(blue_data)[-1]
+    blueEXPDiff = getGoldEXPDifference(blue_data)[:,-1]
 
     data = np.zeros(blueEXPDiff.shape)
 
@@ -157,14 +156,25 @@ def setKDADifference(blue_data, red_data):
     blueKDA = getTeamKDA(blue_data)
     redKDA = getTeamKDA(red_data)
 
-    blueKDA = (blueKDA[0] + blueKDA[2]) / blueKDA[1]
-    redKDA = (redKDA[0] + redKDA[2]) / redKDA[2]
+    blueKDA = (blueKDA[:,0] + blueKDA[:,2]) / blueKDA[:,1]
+    redKDA = (redKDA[:,0] + redKDA[:,2]) / redKDA[:,1]
 
     diff = blueKDA - redKDA
 
     data = np.zeros(blueKDA.shape)
 
     return _simple3(diff,data)
+
+def laneScoring(team_data):
+    pass
+
+def teamplayScoring(team_data):
+    #find a good weight for jungle monsters, turrets, and ward score
+    jungleMonsters = getTotalStats(team_data)[-1]
+    turrets = getObjectives(team_data)[-1]
+
+    pass
+
 
 
 
@@ -191,12 +201,6 @@ def dataSetTrueExtraction(win_condition, blue_data, red_data):
     #Lane Dominance: Can estimate this through Gold Difference, Experience, and KDA
     #Teamplay: Can estimate this through Jungle Monsters Killed, Turrets Destroyed, Ward Score, and Elite Monsters killed.
 
-    
-
-
-
-    
-
 
 if __name__ == "__main__":
 
@@ -208,8 +212,5 @@ if __name__ == "__main__":
     blue_data = data[:,2:21]
     red_data = data[:,21:40]
 
-    dataSetTrueExtraction(win_condition, blue_data, red_data)
-
-
-    #FILL IN FOR DATA VIEW
+    #dataSetTrueExtraction(win_condition, blue_data, red_data)
 
