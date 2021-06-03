@@ -116,8 +116,8 @@ def setTurretsDestroyed(blue_data, red_data):
     return _simple3(diff, data)
 
 def setCSDifference(blue_data, red_data):
-    blueMinionScore = getTotalStats(blue_data)
-    redMinionScore = getTotalStats(red_data)
+    blueMinionScore = getTotalStats(blue_data)[:,3]
+    redMinionScore = getTotalStats(red_data)[:,3]
     diff = blueMinionScore - redMinionScore
     data = np.zeros(blueMinionScore.shape)
 
@@ -157,8 +157,9 @@ def setKDADifference(blue_data, red_data):
     blueKDA = getTeamKDA(blue_data)
     redKDA = getTeamKDA(red_data)
 
-    blueKDA = (blueKDA[:,0] + blueKDA[:,2]) / blueKDA[:,1]
-    redKDA = (redKDA[:,0] + redKDA[:,2]) / redKDA[:,1]
+    #Normalize KDA
+    blueKDA = (blueKDA[:,0] + blueKDA[:,2]) / (blueKDA[:,1] + 1)
+    redKDA = (redKDA[:,0] + redKDA[:,2]) / (redKDA[:,1] + 1)
 
     diff = blueKDA - redKDA
 
@@ -166,10 +167,49 @@ def setKDADifference(blue_data, red_data):
 
     return _simple3(diff,data)
 
-def laneScoring(team_data):
-    pass
+def laneScoring(team_data, win_condition, team):
+    #The higher the gold, then possibility of better items(more control of the game)
+    #the higher the exp, then the possibility of reaching skill ranks faster to make a difference
+    gold = getTotalStats(team_data)[:,0]
+    exp = getTotalStats(team_data)[:,1]
+    kda = getTeamKDA(team_data)
+    kda = (kda[:,0] + kda[:,2]) / (kda[:,1] + 1)
 
-def teamplayScoring(team_data, win_condition, team):
+    if team == "b":
+        goldThresh = gold * win_condition
+        expThresh = exp * win_condition
+        kdaThresh = kda * win_condition
+    elif team == "r":
+        goldThresh = gold * np.logical_not(win_condition)
+        expThresh = exp * np.logical_not(win_condition)
+        kdaThresh = kda * np.logical_not(win_condition)
+
+    #Confidence level of 10%
+
+    goldIndices, = np.where(goldThresh == 0)
+    goldWinThresh = np.mean(np.delete(goldThresh, goldIndices)) * 0.9
+    expIndices, = np.where(expThresh == 0)
+    expWinThresh = np.mean(np.delete(expThresh, expIndices)) * 0.96
+    kdaIndices, = np.where(kdaThresh == 0)
+    kdaWinThresh = np.mean(np.delete(kdaThresh, kdaIndices)) * 0.4
+
+    goldScoring = np.zeros(goldThresh.shape); expScoring = np.zeros(expThresh.shape); kdaScoring = np.zeros(kda.shape)
+    for i in range(len(goldScoring)):
+        if gold[i] < goldWinThresh: goldScoring[i] = 1.5
+        else: goldScoring[i] = 0.5
+        if exp[i] < expWinThresh: expScoring[i] = 1.5
+        else: expScoring[i] = 0.5
+        if kda[i] < kdaWinThresh: kdaScoring[i] = 1.5
+        else: kdaScoring[i] = 0.5
+    
+
+    return goldScoring + expScoring + kdaScoring
+
+
+    
+    
+
+def teamplayScoring(team_data,win_condition, team):
     #find a good weight for jungle monsters, turrets, ward score, elite monsters
     jungleMonsters = getTotalStats(team_data)[:,-1]
     turrets = getObjectives(team_data)[:,-1]
@@ -194,8 +234,6 @@ def teamplayScoring(team_data, win_condition, team):
     indices = np.where(thres == 0)
     right_thres = np.mean(np.delete(thres, indices)) * 1.3
     left_thres = np.mean(np.delete(thres, indices)) * 0.7
-
-    print(right_thres,left_thres)
 
     jungleScoring = np.zeros(jungleMonsters.shape)
 
@@ -238,7 +276,7 @@ if __name__ == "__main__":
     blue_data = data[:,2:21]
     red_data = data[:,21:40]
 
-    print(teamplayScoring(blue_data, win_condition, "b"))
+    laneScoring(blue_data, win_condition, "b")
 
     #dataSetTrueExtraction(win_condition, blue_data, red_data)
 
