@@ -1,4 +1,5 @@
 import numpy as np
+
 """
 Game Data Organization
 -----------------------
@@ -168,16 +169,42 @@ def setKDADifference(blue_data, red_data):
 def laneScoring(team_data):
     pass
 
-def teamplayScoring(team_data):
-    #find a good weight for jungle monsters, turrets, and ward score
-    jungleMonsters = getTotalStats(team_data)[-1]
-    turrets = getObjectives(team_data)[-1]
+def teamplayScoring(team_data, win_condition, team):
+    #find a good weight for jungle monsters, turrets, ward score, elite monsters
+    jungleMonsters = getTotalStats(team_data)[:,-1]
+    turrets = getObjectives(team_data)[:,-1]
+    wardScore = np.sum(getWardData(team_data), axis = 1)
+    eliteMonsters = getObjectives(team_data)[:,0]
 
-    pass
+    #outweigh the elite Monsters and turrets(more significant in the first 10 mins as an indicator)
+    turretScoring = turrets * 10
+    eliteScoring  = eliteMonsters * 10
 
+    #Reduce the scoring of the wards(more wards the better)
+    wardScoring = wardScore / 5.0
 
+    #jungleMonsters: bad teamplay if very low
+    # good teamplay if decently average
+    # but can be indicator of jungle solo play if too high
+    if team == "b":
+        thres = jungleMonsters * win_condition
+    elif team == "r":
+        thres = jungleMonsters * np.logical_not(win_condition)
+    
+    indices = np.where(thres == 0)
+    right_thres = np.mean(np.delete(thres, indices)) * 1.3
+    left_thres = np.mean(np.delete(thres, indices)) * 0.7
 
+    print(right_thres,left_thres)
 
+    jungleScoring = np.zeros(jungleMonsters.shape)
+
+    for i in range(len(jungleScoring)):
+        if jungleMonsters[i] < left_thres: jungleScoring[i] = jungleMonsters[i] / 10.0
+        elif jungleMonsters[i] < right_thres: jungleScoring[i] = jungleMonsters[i] / 5.0
+        else: jungleScoring[i] = jungleMonsters[i] / 8.0
+
+    return turretScoring + jungleScoring + wardScoring + eliteScoring
 
 #Creating new data that uses the average data: KDA, Jungle Monsters Killed, CS Difference, Ward Score Diff, Gold Diff, Exp Diff, 
 #Reordering into the following topographic order: Jungle Monsters, Turrets Destroyed, Total CS Diff, Ward Score, Elite Monsters, Gold Diff, Experience Diff, KDA, Lane Dominance, Teamplay, Win Condition
@@ -191,7 +218,6 @@ def dataSetTrueExtraction(win_condition, blue_data, red_data):
     CSDifference = setCSDifference(blue_data, red_data)
     eliteMonstersDifference = setEliteMonsters(blue_data, red_data)
 
-    #TODO
     #Dependent Factors for the new data set
     goldDifference = setGoldDifference(blue_data)
     expDifference = setExperienceDifference(blue_data)
@@ -211,6 +237,8 @@ if __name__ == "__main__":
     win_condition = data[:,1]
     blue_data = data[:,2:21]
     red_data = data[:,21:40]
+
+    print(teamplayScoring(blue_data, win_condition, "b"))
 
     #dataSetTrueExtraction(win_condition, blue_data, red_data)
 
