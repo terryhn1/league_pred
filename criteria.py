@@ -54,3 +54,10 @@ Common Criteria:
 """
 
 
+def teamplayScoring():
+    pass
+
+def laneDominanceScoring():
+    pass
+
+

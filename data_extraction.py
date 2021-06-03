@@ -138,15 +138,64 @@ def setEliteMonsters(blue_data, red_data):
 
     return _simple3(diff,data)
 
+def setGoldDifference(blue_data):
+    #3 Possible states
+    blueGoldDiff = getGoldEXPDifference(blue_data)[0]
+
+    data = np.zeros(blueGoldDiff.shape)
+
+    return _simple3(blueGoldDiff, data)
+
+def setExperienceDifference(blue_data):
+    blueEXPDiff = getGoldEXPDifference(blue_data)[-1]
+
+    data = np.zeros(blueEXPDiff.shape)
+
+    return _simple3(blueEXPDiff, data)
+
+def setKDADifference(blue_data, red_data):
+    blueKDA = getTeamKDA(blue_data)
+    redKDA = getTeamKDA(red_data)
+
+    blueKDA = (blueKDA[0] + blueKDA[2]) / blueKDA[1]
+    redKDA = (redKDA[0] + redKDA[2]) / redKDA[2]
+
+    diff = blueKDA - redKDA
+
+    data = np.zeros(blueKDA.shape)
+
+    return _simple3(diff,data)
+
+
+
 
 #Creating new data that uses the average data: KDA, Jungle Monsters Killed, CS Difference, Ward Score Diff, Gold Diff, Exp Diff, 
 #Reordering into the following topographic order: Jungle Monsters, Turrets Destroyed, Total CS Diff, Ward Score, Elite Monsters, Gold Diff, Experience Diff, KDA, Lane Dominance, Teamplay, Win Condition
 def dataSetTrueExtraction(win_condition, blue_data, red_data):
 
+
+    #Independent Factors for the new data set
     wardDifference = setWardStates(blue_data, red_data)
     jungleDifference = setJGMonstersKilled(blue_data, red_data)
     turretsDifference = setTurretsDestroyed(blue_data, red_data)
     CSDifference = setCSDifference(blue_data, red_data)
+    eliteMonstersDifference = setEliteMonsters(blue_data, red_data)
+
+    #TODO
+    #Dependent Factors for the new data set
+    goldDifference = setGoldDifference(blue_data)
+    expDifference = setExperienceDifference(blue_data)
+    kdaDifference = setKDADifference(blue_data,red_data)
+
+    #Factors that require scoring based
+    #Lane Dominance: Can estimate this through Gold Difference, Experience, and KDA
+    #Teamplay: Can estimate this through Jungle Monsters Killed, Turrets Destroyed, Ward Score, and Elite Monsters killed.
+
+    
+
+
+
+    
 
 
 if __name__ == "__main__":
