@@ -51,9 +51,28 @@ def getGoldEXPDifference(team_data):
 def getFarmPerMin(team_data):
     return team_data[:,17:19]
 
+#Scoring
+def setWardStates(blue_data, red_data):
+    blueWardData = getWardData(blue_data)
+    redWardData = getWardData(red_data)
+    wardDifference = np.sum(blueWardData, axis =1) - np.sum(redWardData,axis = 1)
+    data = np.zeros(wardDifference.shape)
+    for i in range(wardDifference):
+        if wardDifference[i] == 0: data[i] = 0
+        elif wardDifference[i] > 0: data[i] = 1
+        elif wardDifference[i] < 0: data[i] = 2
+    
+    return data
 
-#Create the functions that are needed to get the estimated probabilties(Make this similar to Assignment 4 for consistency).
 
+#Creating new data that uses the average data: KDA, Jungle Monsters Killed, CS Difference, Ward Score Diff, Gold Diff, Exp Diff, 
+#Reordering into the following topographic order: Jungle Monsters, Turrets Destroyed, Total CS Diff, Ward Score, Elite Monsters, Gold Diff, Experience Diff, KDA, Lane Dominance, Teamplay, Win Condition
+def dataSetTrueExtraction(win_condition, blue_data, red_data):
+    wardDifference = setWardStates(blue_data, red_data)
+
+
+    
+    
 
 
 if __name__ == "__main__":
@@ -65,6 +84,8 @@ if __name__ == "__main__":
     win_condition = data[:,1]
     blue_data = data[:,2:21]
     red_data = data[:,21:40]
+
+    dataSetTrueExtraction(win_condition, blue_data, red_data)
 
 
     #FILL IN FOR DATA VIEW

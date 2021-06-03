@@ -53,6 +53,4 @@ Common Criteria:
 
 """
 
-    #new_data
-
 

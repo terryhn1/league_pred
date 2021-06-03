@@ -10,7 +10,7 @@ import numpy as np
 
     Total CS Difference: 2 States(average threshold)
 
-    Ward Score Difference: 2 States(average threshold)
+    Ward Score Difference: 3 States(0 for no team advantage, 1 for blue team advantage, 2 for red team advantage)
 
     Elite Monsters: 3 States(max of 2 elite monsters can be taken within first 10 minutes practically)
 
@@ -31,7 +31,7 @@ def initializeGraphModel():
     #Initialize the Variables
     jgMonstersKilled = gm.Var(0, 2)
     turretsDestroyed = gm.Var(1, 4)
-    csDifference = gm.Var(2, 2)
+    csDifference = gm.Var(2, 3)
     wardScoreDifference = gm.Var(3, 2)
     eliteMonsters = gm.Var(4, 3)
     goldDifference = gm.Var(5, 2)
