@@ -81,7 +81,7 @@ def setJGMonstersKilled(blue_data, red_data):
     data = np.zeros(blueJG.shape)
 
     #Identify whether Junglers show Gold Dominance, Experience Difference, or Teamplay
-    #All values are written in binary to cover a 2-bit number
+    #All values are written in binary to cover a 4-bit number
 
     for i in range(len(data)):
         blueTeamplayOriented = 1 if leftthres < blueJG[i] <= rightthres else 0
@@ -95,6 +95,28 @@ def setJGMonstersKilled(blue_data, red_data):
     
     return data
 
+def setTurretsDestroyed(blue_data, red_data):
+    blueTurretScore = getObjectives(blue_data)[-1]
+    redTurretScore = getObjectives(red_data)[-1]
+    diff = blueTurretScore - redTurretScore
+
+    data = np.zeros(blueTurretScore.shape)
+
+    #We are interested in seeing which team displays more teamplay
+    #Therefore the states that given are only 0, 1, and 2
+    for i in range(len(diff)):
+        if diff[i] == 0: data[i] = 0
+        elif diff[i] > 0: data[i] = 1
+        elif diff[i] < 0: data[i] = 2
+
+    return data
+
+def setCSDifference(blue_data, red_data):
+    pass
+
+def setEliteMonsters(blue_data, red_data):
+    pass
+
 
 #Creating new data that uses the average data: KDA, Jungle Monsters Killed, CS Difference, Ward Score Diff, Gold Diff, Exp Diff, 
 #Reordering into the following topographic order: Jungle Monsters, Turrets Destroyed, Total CS Diff, Ward Score, Elite Monsters, Gold Diff, Experience Diff, KDA, Lane Dominance, Teamplay, Win Condition
@@ -102,7 +124,8 @@ def dataSetTrueExtraction(win_condition, blue_data, red_data):
 
     wardDifference = setWardStates(blue_data, red_data)
     jungleDifference = setJGMonstersKilled(blue_data, red_data)
-
+    turretsDifference = setTurretsDestroyed(blue_data, red_data)
+    
 
     
     

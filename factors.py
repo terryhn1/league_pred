@@ -4,7 +4,7 @@ import numpy as np
 """
     Variables can use an average of training data to determine the states seen.
 
-    Jungle Monsters Killed: 2 States(average threshold)
+    Jungle Monsters Killed: 16 States(4-bit number indicating red/blue teamplay indicator + team lead diff)
 
     Turrets Destroyed: 4 States(max of 3 turrets can be destroyed early game if large teamplay)
 
@@ -29,7 +29,7 @@ import numpy as np
 def initializeGraphModel():
 
     #Initialize the Variables
-    jgMonstersKilled = gm.Var(0, 2)
+    jgMonstersKilled = gm.Var(0, 16)
     turretsDestroyed = gm.Var(1, 4)
     csDifference = gm.Var(2, 3)
     wardScoreDifference = gm.Var(3, 2)
