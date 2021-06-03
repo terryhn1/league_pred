@@ -57,10 +57,41 @@ def setWardStates(blue_data, red_data):
     redWardData = getWardData(red_data)
     wardDifference = np.sum(blueWardData, axis =1) - np.sum(redWardData,axis = 1)
     data = np.zeros(wardDifference.shape)
-    for i in range(wardDifference):
+    for i in range(len(wardDifference)):
         if wardDifference[i] == 0: data[i] = 0
         elif wardDifference[i] > 0: data[i] = 1
         elif wardDifference[i] < 0: data[i] = 2
+    
+    return data
+
+def setJGMonstersKilled(blue_data, red_data):
+    blueJG = getTotalStats(blue_data)[-1]
+    redJG = getTotalStats(red_data)[-1]
+
+    #Put it into thresholds
+    avgJG = np.sum(blueJG) + np.sum(redJG) / (len(blueJG) * 2)
+    minJG = min(blueJG) if min(blueJG) < min(redJG) else min(redJG)
+    maxJG = max(blueJG) if max(blueJG) > max(redJG) else max(redJG)
+
+    #meet at midpoint for the threshold for now
+    leftthres = (avgJG + minJG) / 2.0 
+    rightthres = (avgJG + maxJG) / 2.0
+
+    #data separation
+    data = np.zeros(blueJG.shape)
+
+    #Identify whether Junglers show Gold Dominance, Experience Difference, or Teamplay
+    #All values are written in binary to cover a 2-bit number
+
+    for i in range(len(data)):
+        blueTeamplayOriented = 1 if leftthres < blueJG[i] <= rightthres else 0
+        redTeamplayOriented = 1 if leftthres < redJG[i] <= rightthres else 0
+
+        jgKillsDifference = blueJG[i] - redJG[i]
+        blueLead = 1 if jgKillsDifference >  0 else 0
+        redLead = 1 if jgKillsDifference < 0 else 0
+
+        data[i] = int(str(blueTeamplayOriented) + str(blueLead) + str(redTeamplayOriented) + str(redLead), 2)
     
     return data
 
@@ -68,7 +99,9 @@ def setWardStates(blue_data, red_data):
 #Creating new data that uses the average data: KDA, Jungle Monsters Killed, CS Difference, Ward Score Diff, Gold Diff, Exp Diff, 
 #Reordering into the following topographic order: Jungle Monsters, Turrets Destroyed, Total CS Diff, Ward Score, Elite Monsters, Gold Diff, Experience Diff, KDA, Lane Dominance, Teamplay, Win Condition
 def dataSetTrueExtraction(win_condition, blue_data, red_data):
+
     wardDifference = setWardStates(blue_data, red_data)
+    jungleDifference = setJGMonstersKilled(blue_data, red_data)
 
 
     
