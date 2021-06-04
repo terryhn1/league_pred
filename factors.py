@@ -36,9 +36,9 @@ def initializeGraphModel():
     eliteMonsters = gm.Var(4, 3)
     goldDifference = gm.Var(5, 3)
     expDifference = gm.Var(6, 3)
-    teamplayScore = gm.Var(7, 3)
-    avgKDA = gm.Var(8, 3)
-    laneDominance = gm.Var(9, 3)
+    avgKDA = gm.Var(7, 3)
+    laneDominance = gm.Var(8, 3)
+    teamplayScore = gm.Var(9, 3)
     winCondition = gm.Var(10, 2)
 
     #Initialize the factors
@@ -48,22 +48,39 @@ def initializeGraphModel():
     f3 = gm.Factor([csDifference])
     f4 = gm.Factor([wardScoreDifference])
     f5 = gm.Factor([eliteMonsters])
-    f6 = gm.Factor([goldDifference, jgMonstersKilled, jgMonstersKilled])
+    f6 = gm.Factor([goldDifference, jgMonstersKilled, csDifference, eliteMonsters])
     f7 = gm.Factor([expDifference, jgMonstersKilled, csDifference])
     f8 = gm.Factor([avgKDA])
-    f9 = gm.Factor([teamplayScore, jgMonstersKilled, turretsDestroyed, wardScoreDifference, eliteMonsters])
-    f10 = gm.Factor([laneDominance, goldDifference, expDifference, avgKDA])
+    f9 = gm.Factor([laneDominance, goldDifference, expDifference, avgKDA])
+    f10 = gm.Factor([teamplayScore, jgMonstersKilled, turretsDestroyed, wardScoreDifference, eliteMonsters])
     f11 = gm.Factor([winCondition, laneDominance, teamplayScore])
 
     return gm.GraphModel([f1,f2, f3, f4, f5, f6, f7, f8, f9, f10, f11])
 
 def loadData(model):
     data = np.genfromtxt("data.csv", delimiter = ",")
+
+    for xj in data:
+        model.factors[0][xj[model.X[0]]] += 1.0
+        model.factors[1][xj[model.X[1]]] += 1.0
+        model.factors[2][xj[model.X[2]]] += 1.0
+        model.factors[3][xj[model.X[3]]] += 1.0
+        model.factors[4][xj[model.X[4]]] += 1.0
+        model.factors[5][xj[model.X[0]], xj[model.X[2]], xj[model.X[4]], xj[model.X[5]]] += 1.0
+        model.factors[6][xj[model.X[0]], xj[model.X[2]], xj[model.X[6]]] += 1.0
+        model.factors[7][xj[model.X[7]]] += 1.0
+        model.factors[8][xj[model.X[5]], xj[model.X[6]], xj[model.X[7], xj[model.X[8]]]] += 1.0
+        model.factors[9][xj[model.X[0]], xj[model.X[1]], xj[model.X[3]], xj[model.X[4]], xj[model.X[9]]] += 1.0
+        model.factors[10][xj[model.X[8]], xj[model.X[9]], xj[model.X[10]]] += 1.0
+
+    for i in range(len(model.factors)):
+        model.factors[i] /= len(model.factors)
+    
+    return model
+
+
     return 
 
-
-
-if __name__ == "__main__":
 
 
 
