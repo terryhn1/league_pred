@@ -141,14 +141,12 @@ def setEliteMonsters(blue_data, red_data):
 def setGoldDifference(blue_data):
     #3 Possible states
     blueGoldDiff = getGoldEXPDifference(blue_data)[:,0]
-
     data = np.zeros(blueGoldDiff.shape)
 
     return _simple3(blueGoldDiff, data)
 
 def setExperienceDifference(blue_data):
     blueEXPDiff = getGoldEXPDifference(blue_data)[:,-1]
-
     data = np.zeros(blueEXPDiff.shape)
 
     return _simple3(blueEXPDiff, data)
@@ -162,7 +160,6 @@ def setKDADifference(blue_data, red_data):
     redKDA = (redKDA[:,0] + redKDA[:,2]) / (redKDA[:,1] + 1)
 
     diff = blueKDA - redKDA
-
     data = np.zeros(blueKDA.shape)
 
     return _simple3(diff,data)
@@ -202,12 +199,13 @@ def laneScoring(team_data, win_condition, team):
         if kda[i] < kdaWinThresh: kdaScoring[i] = 1.5
         else: kdaScoring[i] = 0.5
     
-
     return goldScoring + expScoring + kdaScoring
 
-
+def setLaneTeamplayDifference(blueScore, redScore):
+    diff = blueScore - redScore
+    data = np.zeros(diff.shape)
     
-    
+    return _simple3(diff, data)
 
 def teamplayScoring(team_data,win_condition, team):
     #find a good weight for jungle monsters, turrets, ward score, elite monsters
@@ -246,8 +244,15 @@ def teamplayScoring(team_data,win_condition, team):
 
 #Creating new data that uses the average data: KDA, Jungle Monsters Killed, CS Difference, Ward Score Diff, Gold Diff, Exp Diff, 
 #Reordering into the following topographic order: Jungle Monsters, Turrets Destroyed, Total CS Diff, Ward Score, Elite Monsters, Gold Diff, Experience Diff, KDA, Lane Dominance, Teamplay, Win Condition
-def dataSetTrueExtraction(win_condition, blue_data, red_data):
+def dataSetTrueExtraction():
 
+    #Load in league data. File name can vary
+    data = np.genfromtxt("diamond_data.csv", delimiter = ",")[1:]
+
+    #Separation of Data
+    win_condition = data[:,1]
+    blue_data = data[:,2:21]
+    red_data = data[:,21:40]
 
     #Independent Factors for the new data set
     wardDifference = setWardStates(blue_data, red_data)
@@ -264,19 +269,20 @@ def dataSetTrueExtraction(win_condition, blue_data, red_data):
     #Factors that require scoring based
     #Lane Dominance: Can estimate this through Gold Difference, Experience, and KDA
     #Teamplay: Can estimate this through Jungle Monsters Killed, Turrets Destroyed, Ward Score, and Elite Monsters killed.
+    blueTeamplayScore = teamplayScoring(blue_data, win_condition, "b")
+    redTeamplayScore = teamplayScoring(red_data,win_condition, "r")
+    teamplayDifference = setLaneTeamplayDifference(blueTeamplayScore, redTeamplayScore)
 
+    blueLaneScore = laneScoring(blue_data, win_condition, "b")
+    redlaneScore = laneScoring(red_data, win_condition, "r")
+    laneDifference = setLaneTeamplayDifference(blueLaneScore, redlaneScore)
+
+    scores = np.array([jungleDifference, turretsDifference, CSDifference, wardDifference, eliteMonstersDifference,
+                        goldDifference, expDifference, kdaDifference, laneDifference, teamplayDifference, win_condition]).T
+
+    return scores
 
 if __name__ == "__main__":
-
-    #Load in league data. File name can vary
-    data = np.genfromtxt("diamond_data.csv", delimiter = ",")[1:]
-
-    #Separation of Data
-    win_condition = data[:,1]
-    blue_data = data[:,2:21]
-    red_data = data[:,21:40]
-
-    laneScoring(blue_data, win_condition, "b")
-
-    #dataSetTrueExtraction(win_condition, blue_data, red_data)
+    data = dataSetTrueExtraction()
+    np.savetxt("data.csv", data, delimiter = ",")
 
