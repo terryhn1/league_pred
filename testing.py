@@ -5,6 +5,7 @@ import copy
 
 def testConditions(model, valid):
     reset = copy.deepcopy(model)
+    sumElim = lambda F, Xlist: F.sum(Xlist)
     limit = 10
     iter = 0
     for xj in valid:
@@ -12,8 +13,6 @@ def testConditions(model, valid):
                     , model.X[4]: xj[4], model.X[5]: xj[5], model.X[6]: xj[6], model.X[7]: xj[7]
                     , model.X[8]: xj[8], model.X[9]: xj[9]}
         model.condition(conditions)
-        model.drawMarkovGraph(var_labels = vars,pos = pos)
-        sumElim = lambda F, Xlist: F.sum(Xlist)
 
         #Calculates the probability of win condition based on the evidence seen
         model.eliminate(model.X[:-1], sumElim)
