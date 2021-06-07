@@ -1,3 +1,4 @@
+from math import exp
 import pyGMs as gm
 import numpy as np
 
@@ -55,31 +56,41 @@ def initializeGraphModel():
     f10 = gm.Factor([teamplayScore, jgMonstersKilled, turretsDestroyed, wardScoreDifference, eliteMonsters])
     f11 = gm.Factor([winCondition, laneDominance, teamplayScore])
 
-    return gm.GraphModel([f1,f2, f3, f4, f5, f6, f7, f8, f9, f10, f11])
+    factors = [f1,f2, f3, f4, f5, f6, f7, f8, f9, f10, f11]
 
-def loadData(model):
+    return gm.GraphModel(factors), factors
+
+def loadData(model,factors):
     data = np.genfromtxt("data.csv", delimiter = ",")
+    data_int = np.array([list(xj) for xj in data],dtype= int)
+    nTrain = int(.75 * len(data_int))   
+    train = data_int[:nTrain]
+    valid = data_int[nTrain:]
 
-    for xj in data:
-        model.factors[0][xj[model.X[0]]] += 1.0
-        model.factors[1][xj[model.X[1]]] += 1.0
-        model.factors[2][xj[model.X[2]]] += 1.0
-        model.factors[3][xj[model.X[3]]] += 1.0
-        model.factors[4][xj[model.X[4]]] += 1.0
-        model.factors[5][xj[model.X[0]], xj[model.X[2]], xj[model.X[4]], xj[model.X[5]]] += 1.0
-        model.factors[6][xj[model.X[0]], xj[model.X[2]], xj[model.X[6]]] += 1.0
-        model.factors[7][xj[model.X[7]]] += 1.0
-        model.factors[8][xj[model.X[5]], xj[model.X[6]], xj[model.X[7], xj[model.X[8]]]] += 1.0
-        model.factors[9][xj[model.X[0]], xj[model.X[1]], xj[model.X[3]], xj[model.X[4]], xj[model.X[9]]] += 1.0
-        model.factors[10][xj[model.X[8]], xj[model.X[9]], xj[model.X[10]]] += 1.0
+
+    jgMonstersKilled = model.X[0]; turretsDestroyed = model.X[1]; csDifference = model.X[2]
+    wardScoreDifference = model.X[3]; eliteMonsters = model.X[4]; goldDifference = model.X[5]
+    expDifference = model.X[6]; avgKDA = model.X[7]; laneDominance = model.X[8]
+    teamplayScore = model.X[9]; winCondition = model.X[10]
+
+    # Maximum Likelihood Estimator
+    for xj in train:
+        factors[0][xj[jgMonstersKilled]] += 1.0
+        factors[1][xj[turretsDestroyed]] += 1.0
+        factors[2][xj[csDifference]] += 1.0
+        factors[3][xj[wardScoreDifference]] += 1.0
+        factors[4][xj[eliteMonsters]] += 1.0
+        factors[5][xj[jgMonstersKilled], xj[csDifference], xj[eliteMonsters], xj[goldDifference]] += 1.0
+        factors[6][xj[jgMonstersKilled], xj[csDifference], xj[expDifference]] += 1.0
+        factors[7][xj[avgKDA]] += 1.0
+        factors[8][xj[goldDifference], xj[expDifference], xj[avgKDA], xj[laneDominance]] += 1.0
+        factors[9][xj[jgMonstersKilled], xj[turretsDestroyed], xj[csDifference], xj[eliteMonsters], xj[teamplayScore]] += 1.0
+        factors[10][xj[laneDominance], xj[teamplayScore], xj[winCondition]] += 1.0
 
     for i in range(len(model.factors)):
-        model.factors[i] /= len(model.factors)
+        factors[i] /= len(train)
     
-    return model
-
-
-    return 
+    return gm.GraphModel(factors), valid
 
 
 

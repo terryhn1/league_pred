@@ -140,18 +140,22 @@ def setEliteMonsters(blue_data, red_data):
 
 def setGoldDifference(blue_data):
     #3 Possible states
+    #TODO Weight out the difference to take out small differences(Not good indicator of a win condition)
     blueGoldDiff = getGoldEXPDifference(blue_data)[:,0]
     data = np.zeros(blueGoldDiff.shape)
 
     return _simple3(blueGoldDiff, data)
 
 def setExperienceDifference(blue_data):
+    #TODO Weight out the difference to take out small differences(Not good indicator of win condition)
     blueEXPDiff = getGoldEXPDifference(blue_data)[:,-1]
     data = np.zeros(blueEXPDiff.shape)
 
     return _simple3(blueEXPDiff, data)
 
 def setKDADifference(blue_data, red_data):
+
+    #TODO Weight out the difference to take out small differences(Not good indicator of )
     blueKDA = getTeamKDA(blue_data)
     redKDA = getTeamKDA(red_data)
 
