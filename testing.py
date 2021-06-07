@@ -3,7 +3,7 @@ import factors
 import copy
 
 
-def testConditions(model, valid, vars, pos):
+def testConditions(model, valid):
     reset = copy.deepcopy(model)
     limit = 10
     iter = 0
@@ -34,9 +34,5 @@ if __name__ == "__main__":
     model, factor_list = factors.initializeGraphModel()
     
     model, valid = factors.loadData(model, factor_list)
-    var_labels = {0: "jungle", 1: "turrets", 2: "cs", 3: "ward", 4: "elite", 5: "gold", 6: "exp", 7: "kda", 8: "lane", 9: "teamplay", 10: "win"}
-    pos = {model.X[0]: (0,3), model.X[1]:(1,3), model.X[2]:(2,3), model.X[3]:(3,3), 
-       model.X[4]:(4,3), model.X[5]:(1,2), model.X[6]:(2,2), model.X[7]:(3,2), 
-       model.X[8]:(1,1), model.X[9]:(2,1), model.X[10]:(2,0)}
-    testConditions(model, valid, var_labels, pos)
+    testConditions(model, valid)
     
