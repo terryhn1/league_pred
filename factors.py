@@ -1,5 +1,5 @@
 from math import exp
-import pyGMs as gm
+import pyGM as gm
 import numpy as np
 
 """
